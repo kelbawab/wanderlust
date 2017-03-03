@@ -7,7 +7,18 @@
 	},
 	"dependencies": {
 		"express": "4.13.x",
-		"cfenv": "1.0.x"
+		"cfenv": "1.0.x",
+		"body-parser": "^1.16.1",
+	    "express-session": "^1.15.1",
+	    "http": "0.0.0",
+	    "jsonwebtoken": "^7.3.0",
+	    "mysql": "^2.13.0",
+	    "passport": "^0.3.2",
+	    "passport-facebook": "^2.1.1",
+	    "path": "^0.12.7",
+	    "util": "^0.10.3",
+	    "validator": "^7.0.0",
+	    "xss-filters": "^1.2.7"
 	},
 	"repository": {},
 	"engines": {
