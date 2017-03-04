@@ -14,6 +14,11 @@ user_model.prototype.select_user = function(data, callback) {
 	this.execute(sql,callback);
 };
 
+user_model.prototype.select_user_profile = function(data, callback) {
+	sql = "SELECT u.first_name, u.last_name, u.image_url, u.cover_image_url, u.birth_date, u.about, c.citizen_name, c.flag_image FROM user u LEFT JOIN country c on u.country_id = c.id WHERE u.id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
 user_model.prototype.select_user_by_facebook_id = function(data, callback) {
 	sql = "SELECT * FROM user WHERE facebook_id= " + data.facebook_id;
 	this.execute(sql,callback);

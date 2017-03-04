@@ -14,6 +14,11 @@ user_activity_model.prototype.select_user_activities = function(data, callback) 
 	this.execute(sql,callback);
 };
 
+user_activity_model.prototype.select_user_activities_details = function(data, callback) {
+	sql = "SELECT a.name, a.description, a.logo FROM user_activity ua JOIN activity a ON ua.activity_id = a.id WHERE ua.user_id =" + data.user_id;
+	this.execute(sql,callback);
+};
+
 user_activity_model.prototype.delete_user_activity = function(data, callback) {
 	sql = "DELETE FROM user_activity WHERE user_id = " + data.user_id;
 	this.execute(sql,callback);

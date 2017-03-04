@@ -30,7 +30,9 @@ module.exports = function(app){
 	app.post('/user/report/post', report_controller.post);
 	app.get('/user/favourite/index', favourite_controller.index);
 	app.get('/user/block/index', block_controller.index);
-	app.get('/user/get/:id', user_controller.get);
+
+	app.post('/user/get', user_controller.get);
+	
 	app.get('/user/index', user_controller.index);
 	app.get('/user/city/index', city_controller.index);
 	app.get('/user/users_city/get/:city_id', users_city_controller.get);
