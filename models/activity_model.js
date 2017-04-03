@@ -5,7 +5,7 @@ activity_model.prototype     		= model;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 activity_model.prototype.select_all_activities = function(callback) {
-	sql = "SELECT * From activity";
+	sql = "SELECT * From activity ORDER BY name";
 	this.execute(sql,callback);
 };
 
