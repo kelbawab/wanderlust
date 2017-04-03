@@ -13,7 +13,7 @@ var mysql      = require('mysql');
 //     database : 'wunderlust'
 // });
 
-var connection = mysql.createConnection({
+var connection = mysql.createPool({
 	connectionLimit : 10,
     host     : 'us-cdbr-iron-east-04.cleardb.net',
     port     : '3306',
@@ -22,12 +22,12 @@ var connection = mysql.createConnection({
     database : 'ad_f47af548feb67bb'
 });
 
-connection.connect(function(err) {
-    if (err) {
-    	console.error('Error connecting: ' + err.stack);
-    	return;
-	}
-	console.log('Connection established');
-});
+// connection.connect(function(err) {
+//     if (err) {
+//     	console.error('Error connecting: ' + err.stack);
+//     	return;
+// 	}
+// 	console.log('Connection established');
+// });
 
 module.exports = connection;
