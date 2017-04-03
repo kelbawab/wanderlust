@@ -24,6 +24,6 @@
   },
   "repository": {},
   "engines": {
-    "node": "4.x"
+    "node": "6.7.0"
   }
 }

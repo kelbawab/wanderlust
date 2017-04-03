@@ -44,7 +44,7 @@ app.use(function(req, res, next) {
 });
 app.use(parser.urlencoded({ extended: false }));
 app.use(parser.json());
-app.use(express.static(__dirname + 'public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 var routes = require('./config/routes')(app);
 
