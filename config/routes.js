@@ -19,7 +19,7 @@ module.exports = function(app){
 
 	//Routes+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	app.post('/facebook_login', authentication_controller.facebook_login);
-	app.post('/user/activities/get', activities_controller.get);
+	app.get('/user/activities/get', activities_controller.get);
 	app.post('/user/activities/post', activities_controller.post);
 	app.get('/user/activity/get/:id', activity_controller.get);
 	app.post('/user/activity/post', activity_controller.post);
