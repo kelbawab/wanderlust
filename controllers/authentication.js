@@ -12,7 +12,10 @@ authentication.prototype.constructor = authentication;
 //Function to list all contacts
 authentication.prototype.facebook_login =  function(req, res) {
 	console.log(req.body);
-	res.send({message: "hello"});
+	var result = res.locals;
+	result['message'] = 'rows';
+	result['code'] = '200';
+	res.send(result);
 	// var data = controller.xssClean(req.body);
  //    var validation_array = facebook_user_validations(data);
 	// if(Object.keys(validation_array).length > 0) {
