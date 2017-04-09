@@ -11,26 +11,28 @@ authentication.prototype.constructor = authentication;
 
 //Function to list all contacts
 authentication.prototype.facebook_login =  function(req, res) {
-	var data = controller.xssClean(req.body);
-    var validation_array = facebook_user_validations(data);
-	if(Object.keys(validation_array).length > 0) {
-		var result = controller.mergeArrays(validation_array, {code: 404, message:'Bad Request'});
-		res.send(result);
-	}
-	else{
-		tomodel.facebook_id = data.id;
-		user_model.select_user_by_facebook_id(tomodel,function(err,rows){
-			//check the existence of the facebook id
-			if(rows.length > 0) {
-				//login
-				login(req, res, rows[0]);
-			}
-			else {
-				//check the existence of the email
-				check_facebook_user_email(req, res, data);
-			}
-		});
-	}
+	console.log(req.body);
+	res.send("sucsses");
+	// var data = controller.xssClean(req.body);
+ //    var validation_array = facebook_user_validations(data);
+	// if(Object.keys(validation_array).length > 0) {
+	// 	var result = controller.mergeArrays(validation_array, {code: 404, message:'Bad Request'});
+	// 	res.send(result);
+	// }
+	// else{
+	// 	tomodel.facebook_id = data.id;
+	// 	user_model.select_user_by_facebook_id(tomodel,function(err,rows){
+	// 		//check the existence of the facebook id
+	// 		if(rows.length > 0) {
+	// 			//login
+	// 			login(req, res, rows[0]);
+	// 		}
+	// 		else {
+	// 			//check the existence of the email
+	// 			check_facebook_user_email(req, res, data);
+	// 		}
+	// 	});
+	// }
 }
 
 function login(req, res, user_info) {
