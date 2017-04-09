@@ -19,39 +19,39 @@ authentication.prototype.facebook_login =  function(req, res) {
 		res.send(result);
 	}
 	else{
-		tomodel.facebook_id = data.user_info.id;
+		tomodel.facebook_id = user_info.id;
 		tomodel.birthday = '';
-		if(data.user_info.birthday){
-			tomodel.birthday = data.user_info.birthday;
+		if(user_info.birthday){
+			tomodel.birthday = user_info.birthday;
 		}
 
 		tomodel.gender = '';
-		if(data.user_info.gender){
-			tomodel.gender = data.user_info.gender;
+		if(user_info.gender){
+			tomodel.gender = user_info.gender;
 		}
 
 		tomodel.first_name = '';
-		if(data.user_info.first_name){
-			tomodel.first_name = data.user_info.first_name;
+		if(user_info.first_name){
+			tomodel.first_name = user_info.first_name;
 		}
 
 		tomodel.last_name = '';
-		if(data.user_info.last_name){
-			tomodel.last_name = data.user_info.last_name;
+		if(user_info.last_name){
+			tomodel.last_name = user_info.last_name;
 		}
 
 		tomodel.cover = '';
-		if(data.user_info.cover){
-			tomodel.cover = data.user_info.cover.source;
+		if(user_info.cover){
+			tomodel.cover = user_info.cover.source;
 		}
 
 		tomodel.picture = '';
-		if(data.user_info.picture){
-			tomodel.picture = data.user_info.picture.data.url;
+		if(user_info.picture){
+			tomodel.picture = user_info.picture.url;
 		}
 
-		if (data.user_info.hometown) {
-			tomodel.country_name = data.user_info.hometown.location.country;
+		if (user_info.hometown) {
+			tomodel.country_name = user_info.hometown.location.country;
 			country_model.select_country_by_name(tomodel,function(err,rows){
 				if(rows.length > 0) {
 					tomodel.country_id = rows[0].id;
@@ -59,8 +59,8 @@ authentication.prototype.facebook_login =  function(req, res) {
 			});
 		}
 
-		if (data.user_info.location) {
-			tomodel.city_name = data.location.location.city;
+		if (user_info.location) {
+			tomodel.city_name = location.location.city;
 			city_model.select_city_by_name(tomodel,function(err,rows){
 				if(rows.length > 0) {
 					tomodel.city_id = rows[0].id;
