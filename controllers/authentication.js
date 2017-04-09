@@ -4,6 +4,7 @@ controller 					= require('./controller');
 function authentication(){
 	tomodel = {};
 	user_model 	= require('../models/user_model');
+	country_model 	= require('../models/country_model');
 	user_activity_model 	= require('../models/user_activity_model');
 	user_token_model 	= require('../models/user_token_model');
 };
@@ -11,37 +12,81 @@ authentication.prototype.constructor = authentication;
 
 //Function to list all contacts
 authentication.prototype.facebook_login =  function(req, res) {
-	console.log(req.body);
-	console.log('=====================================>');
-	console.log(req.body.user_info);
-	console.log('=====================================>');
-	console.log(req.body.user_info.id);
-	console.log('=====================================>');
-	console.log(req.body.user_info.last_name);
-	var result = res.locals;
-	result['message'] = 'rows';
-	result['code'] = '200';
-	res.send(result);
-	// var data = controller.xssClean(req.body);
- //    var validation_array = facebook_user_validations(data);
-	// if(Object.keys(validation_array).length > 0) {
-	// 	var result = controller.mergeArrays(validation_array, {code: 404, message:'Bad Request'});
-	// 	res.send(result);
-	// }
-	// else{
-	// 	tomodel.facebook_id = data.id;
-	// 	user_model.select_user_by_facebook_id(tomodel,function(err,rows){
-	// 		//check the existence of the facebook id
-	// 		if(rows.length > 0) {
-	// 			//login
-	// 			login(req, res, rows[0]);
-	// 		}
-	// 		else {
-	// 			//check the existence of the email
-	// 			check_facebook_user_email(req, res, data);
-	// 		}
-	// 	});
-	// }
+    var user_info = req.body.user_info;
+    var validation_array = facebook_user_validations(user_info);
+    if(Object.keys(validation_array).length > 0) {
+		var result = controller.mergeArrays(validation_array, {code: 404, message:'Bad Request'});
+		res.send(result);
+	}
+	else{
+		tomodel.facebook_id = data.user_info.id;
+		tomodel.birthday = '';
+		if(data.user_info.birthday){
+			tomodel.birthday = data.user_info.birthday;
+		}
+
+		tomodel.gender = '';
+		if(data.user_info.gender){
+			tomodel.gender = data.user_info.gender;
+		}
+
+		tomodel.first_name = '';
+		if(data.user_info.first_name){
+			tomodel.first_name = data.user_info.first_name;
+		}
+
+		tomodel.last_name = '';
+		if(data.user_info.last_name){
+			tomodel.last_name = data.user_info.last_name;
+		}
+
+		tomodel.cover = '';
+		if(data.user_info.cover){
+			tomodel.cover = data.user_info.cover.source;
+		}
+
+		tomodel.picture = '';
+		if(data.user_info.picture){
+			tomodel.picture = data.user_info.picture.data.url;
+		}
+
+		if (data.user_info.hometown) {
+			tomodel.country_name = data.user_info.hometown.location.country;
+			country_model.select_country_by_name(tomodel,function(err,rows){
+				if(rows.length > 0) {
+					tomodel.country_id = rows[0].id;
+				}
+			});
+		}
+
+		if (data.user_info.location) {
+			tomodel.city_name = data.location.location.city;
+			city_model.select_city_by_name(tomodel,function(err,rows){
+				if(rows.length > 0) {
+					tomodel.city_id = rows[0].id;
+				}
+			});
+		}
+		///////////////////////////////////////
+		var result = res.locals;
+		result['message'] = tomodel;
+		result['code'] = '200';
+		res.send(result);
+		/////////////////////////////////////
+		// user_model.select_user_by_facebook_id(tomodel,function(err,rows){
+		// 	//check the existence of the facebook id
+		// 	if(rows.length > 0) {
+		// 		//login
+		// 		//login(req, res, rows[0]);
+		// 	}
+		// 	else {
+		// 		//check the existence of the email
+		// 		//check_facebook_user_email(req, res, data);
+		// 	}
+		// });
+		
+		
+	}
 }
 
 function login(req, res, user_info) {
@@ -107,25 +152,27 @@ function get_user(req, res, user_id) {
 function facebook_user_validations(data) {
 	var validation_array = {};
 	console.log(data);
-	var id = controller.validate({id: data.id},['required', 'integer']);
+	var id = controller.validate({id: data.id},['required']);
 	if(id){
 		validation_array = controller.mergeArrays(validation_array, id);
 	}
-	var email = controller.validate({email: data.email},['email', 'length:0-100']);
-	if(email){
-		validation_array = controller.mergeArrays(validation_array, email);
+	if(data.email) {
+		var email = controller.validate({email: data.email},['email', 'length:0-100']);
+		if(email){
+			validation_array = controller.mergeArrays(validation_array, email);
+		}
 	}
-	var first_name = controller.validate({first_name: data.first_name},['length:0-30']);
-	if(first_name){
-		validation_array = controller.mergeArrays(validation_array, first_name);
+	if(data.first_name) {
+		var first_name = controller.validate({first_name: data.first_name},['length:0-30']);
+		if(first_name){
+			validation_array = controller.mergeArrays(validation_array, first_name);
+		}
 	}
-	var last_name = controller.validate({last_name: data.last_name},['length:0-30']);
-	if(last_name){
-		validation_array = controller.mergeArrays(validation_array, last_name);
-	}
-	var picture = controller.validate({picture: data.picture},['length:0-400']);
-	if(picture){
-		validation_array = controller.mergeArrays(validation_array, picture);
+	if(data.last_name) {
+		var last_name = controller.validate({last_name: data.last_name},['length:0-30']);
+		if(last_name){
+			validation_array = controller.mergeArrays(validation_array, last_name);
+		}	
 	}
 	
 	return validation_array;
