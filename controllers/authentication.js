@@ -109,30 +109,35 @@ function create_new_facebook_user(req, res, user_info) {
 	if(user_info.about){
 		tomodel.about = user_info.about;
 	}
+	var result = res.locals;
+	result['token'] = token;
+	result['activity'] = false;
+	result['first_login'] = false;
+	result['code'] = '200';
+	res.send(result);
+	// user_model.insert_user_facebook(tomodel,function(err,rows){
+	// 	var user_id = rows.insertId;
+	// 	if (user_info.hometown) {
+	// 		tomodel.country_name = user_info.hometown.location.country;
+	// 		country_model.select_country_by_name(tomodel,function(err,rows){
+	// 			if(rows.length > 0) {
+	// 				var country_id = rows[0].id;
+	// 				update_user_country(user_id, country_id);
+	// 			}
+	// 		});
+	// 	}
 
-	user_model.insert_user_facebook(tomodel,function(err,rows){
-		var user_id = rows.insertId;
-		if (user_info.hometown) {
-			tomodel.country_name = user_info.hometown.location.country;
-			country_model.select_country_by_name(tomodel,function(err,rows){
-				if(rows.length > 0) {
-					var country_id = rows[0].id;
-					update_user_country(user_id, country_id);
-				}
-			});
-		}
-
-		if (user_info.location) {
-			tomodel.city_name = location.location.city;
-			city_model.select_city_by_name(tomodel,function(err,rows){
-				if(rows.length > 0) {
-					var city_id = rows[0].id;
-					update_user_city(user_id, city_id);
-				}
-			});
-		}
-		login(req, res, user_id);
-	});
+	// 	if (user_info.location) {
+	// 		tomodel.city_name = location.location.city;
+	// 		city_model.select_city_by_name(tomodel,function(err,rows){
+	// 			if(rows.length > 0) {
+	// 				var city_id = rows[0].id;
+	// 				update_user_city(user_id, city_id);
+	// 			}
+	// 		});
+	// 	}
+	// 	login(req, res, user_id);
+	// });
 }
 
 function update_user_country(user_id, country_id) {
