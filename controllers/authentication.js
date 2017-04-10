@@ -64,6 +64,10 @@ function check_facebook_user_email(req, res, user_info) {
 // }
 
 function create_new_facebook_user(req, res, user_info) {
+	console.log('==============================>');
+	console.log(user_info);
+	console.log(user_info.id);
+	console.log('==============================>');
 	tomodel.facebook_id = user_info.id;
 
 	tomodel.birth_date = '';
@@ -171,7 +175,6 @@ function login(req, res, user_id) {
 
 function facebook_user_validations(data) {
 	var validation_array = {};
-	console.log(data);
 	var id = controller.validate({id: data.id},['required']);
 	if(id){
 		validation_array = controller.mergeArrays(validation_array, id);
