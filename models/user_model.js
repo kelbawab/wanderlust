@@ -5,7 +5,7 @@ user_model.prototype     		= model;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 user_model.prototype.insert_user_facebook = function(data, callback) {
-	sql = "INSERT INTO user (first_name, last_name, facebook_id, image_url, email, created_at) VALUES ('" + data.first_name + "', '" + data.last_name + "', '" + data.facebook_id + "', '" + data.image_url + "', '" + data.email + "', CURRENT_TIMESTAMP)";
+	sql = "INSERT INTO user (first_name, last_name, facebook_id, image_url, email, birth_date, about, cover_image_url, mobile_first, created_at) VALUES ('" + data.first_name + "', '" + data.last_name + "', '" + data.facebook_id + "', '" + data.image_url + "', '" + data.email + "', '" + data.birth_date + "', '" + data.about + "', '" + data.cover + "', 1, CURRENT_TIMESTAMP)";
 	this.execute(sql,callback);
 };
 
@@ -41,6 +41,17 @@ user_model.prototype.update_user_current_city = function(data, callback) {
 
 user_model.prototype.select_users_by_city = function(data, callback) {
 	sql = "SELECT * FROM user WHERE current_city_id= " + data.city_id;
+	this.execute(sql,callback);
+};
+
+
+user_model.prototype.update_user_country = function(data, callback) {
+	sql = "UPDATE user SET country_id = " + data.country_id + " WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_user_city = function(data, callback) {
+	sql = "UPDATE user SET current_city_id = " + data.city_id + " WHERE id= " + data.user_id;
 	this.execute(sql,callback);
 };
 

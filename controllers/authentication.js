@@ -19,104 +19,37 @@ authentication.prototype.facebook_login =  function(req, res) {
 		res.send(result);
 	}
 	else{
-		tomodel.facebook_id = user_info.id;
-		tomodel.birthday = '';
-		if(user_info.birthday){
-			tomodel.birthday = user_info.birthday;
-		}
-
-		tomodel.gender = '';
-		if(user_info.gender){
-			tomodel.gender = user_info.gender;
-		}
-
-		tomodel.first_name = '';
-		if(user_info.first_name){
-			tomodel.first_name = user_info.first_name;
-		}
-
-		tomodel.last_name = '';
-		if(user_info.last_name){
-			tomodel.last_name = user_info.last_name;
-		}
-
-		tomodel.cover = '';
-		if(user_info.cover){
-			tomodel.cover = user_info.cover.source;
-		}
-
-		tomodel.picture = '';
-		if(user_info.picture){
-			tomodel.picture = user_info.picture.url;
-		}
-
-		if (user_info.hometown) {
-			tomodel.country_name = user_info.hometown.location.country;
-			country_model.select_country_by_name(tomodel,function(err,rows){
-				if(rows.length > 0) {
-					tomodel.country_id = rows[0].id;
+		user_model.select_user_by_facebook_id(tomodel,function(err,rows){
+			//check the existence of the facebook id
+			if(rows.length > 0) {
+				//login
+				login(req, res, rows[0].id);
+			}
+			else {
+				//check the existence of the email
+				if(user_info.email) {
+					check_facebook_user_email(req, res, user_info);
 				}
-			});
-		}
-
-		if (user_info.location) {
-			tomodel.city_name = location.location.city;
-			city_model.select_city_by_name(tomodel,function(err,rows){
-				if(rows.length > 0) {
-					tomodel.city_id = rows[0].id;
+				else {
+					//create new facebook user
+					create_new_facebook_user(req, res, user_info);
 				}
-			});
-		}
-		///////////////////////////////////////
-		var result = res.locals;
-		result['message'] = tomodel;
-		result['code'] = '200';
-		res.send(result);
-		/////////////////////////////////////
-		// user_model.select_user_by_facebook_id(tomodel,function(err,rows){
-		// 	//check the existence of the facebook id
-		// 	if(rows.length > 0) {
-		// 		//login
-		// 		//login(req, res, rows[0]);
-		// 	}
-		// 	else {
-		// 		//check the existence of the email
-		// 		//check_facebook_user_email(req, res, data);
-		// 	}
-		// });
-		
-		
+				
+			}
+		});
 	}
 }
 
-function login(req, res, user_info) {
-	var result =  res.locals;
-	result['code'] = 200;
-	result['message'] = "sucsses";
-	result['user_info'] = user_info;
-	tomodel.user_id = user_info.id;
-	user_activity_model.select_user_activities(tomodel,function(err,rows){
-		//check the existence of the facebook id
-		if(rows.length > 0) {
-			result['activity'] = true;
-		}
-		else {
-			result['activity'] = false;
-		}
-		res.send(result);
-	});
-}
-
-function check_facebook_user_email(req, res, data) {
-	tomodel.email = data.email;
+function check_facebook_user_email(req, res, user_info) {
+	tomodel.email = user_info.email;
 	user_model.select_user_by_email(tomodel,function(err,rows){
 		if(rows.length > 0) {
 			//login
-			login(req, res, rows[0]);
+			login(req, res, rows[0].id);
 		}
 		else {
 			//create new facebook user
-			create_new_facebook_user(req, res, data);
+			create_new_facebook_user(req, res, user_info);
 		}
 	});
 }
@@ -130,22 +63,109 @@ function check_facebook_user_email(req, res, data) {
 // 	});
 // }
 
-function create_new_facebook_user(req, res, data) {
-	tomodel.email = data.email;
-	tomodel.facebook_id = data.id;
-	tomodel.first_name = data.first_name;
-	tomodel.last_name = data.last_name;
-	tomodel.image_url = data.picture;
+function create_new_facebook_user(req, res, user_info) {
+	tomodel.facebook_id = user_info.id;
+
+	tomodel.birth_date = '';
+	if(user_info.birthday){
+		tomodel.birth_date = user_info.birthday;
+	}
+
+	tomodel.gender = '';
+	if(user_info.gender){
+		tomodel.gender = user_info.gender;
+	}
+
+	tomodel.first_name = '';
+	if(user_info.first_name){
+		tomodel.first_name = user_info.first_name;
+	}
+
+	tomodel.last_name = '';
+	if(user_info.last_name){
+		tomodel.last_name = user_info.last_name;
+	}
+
+	tomodel.cover = '';
+	if(user_info.cover){
+		tomodel.cover = user_info.cover.source;
+	}
+
+	tomodel.image_url = '';
+	if(user_info.picture){
+		tomodel.image_url = user_info.picture.data.url;
+	}
+	
+	tomodel.email = '';
+	if(user_info.email){
+		tomodel.email = user_info.email;
+	}	
+
+	tomodel.about = '';
+	if(user_info.about){
+		tomodel.about = user_info.about;
+	}
+
 	user_model.insert_user_facebook(tomodel,function(err,rows){
 		var user_id = rows.insertId;
-		get_user(req, res, user_id);
+		if (user_info.hometown) {
+			tomodel.country_name = user_info.hometown.location.country;
+			country_model.select_country_by_name(tomodel,function(err,rows){
+				if(rows.length > 0) {
+					var country_id = rows[0].id;
+					update_user_country(user_id, country_id);
+				}
+			});
+		}
+
+		if (user_info.location) {
+			tomodel.city_name = location.location.city;
+			city_model.select_city_by_name(tomodel,function(err,rows){
+				if(rows.length > 0) {
+					var city_id = rows[0].id;
+					update_user_city(user_id, city_id);
+				}
+			});
+		}
+		login(req, res, user_id);
 	});
 }
 
-function get_user(req, res, user_id) {
+function update_user_country(user_id, country_id) {
 	tomodel.user_id = user_id;
-	user_model.select_user(tomodel,function(err,rows){
-		login(req, res, rows[0]);
+	tomodel.country_id = country_id;
+	user_model.update_user_country(tomodel,function(err,rows){});
+}
+
+function update_user_city(user_id, city_id) {
+	tomodel.user_id = user_id;
+	tomodel.city_id = city_id;
+	user_model.update_user_city(tomodel,function(err,rows){});
+}
+
+function login(req, res, user_id) {
+	tomodel.user_id = user_id;
+	var token = generateToken(user_id, '24h');
+	var result = res.locals;
+	result['token'] = token;
+	result['activity'] = false;
+	result['first_login'] = false;
+	result['code'] = '200';
+	tomodel.token = token;
+	user_token_model.insert_new_record(tomodel,function(err,rows){
+		user_activity_model.select_user_activities(tomodel,function(err,rows){
+			if(rows.length > 0) {
+				result['activity'] = true;
+			}
+			user_model.select_user(tomodel,function(err,rows){
+				if(rows.length > 0) {
+					if(rows[0].mobile_first == 1) {
+						result['first_login'] = true;	
+					}
+				}
+				res.send(result);
+			});	
+		});
 	});
 }
 

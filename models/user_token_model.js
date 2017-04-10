@@ -5,7 +5,7 @@ user_token_model.prototype     		= model;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 user_token_model.prototype.insert_new_record = function(data, callback) {
-	sql = "INSERT INTO user_token (user_id, token, refresher_token) VALUES (" + data.user_id + ", '" + data.token + "', '" + data.refresher_token + "')";
+	sql = "INSERT INTO user_token (user_id, token) VALUES (" + data.user_id + ", '" + data.token + "')";
 	this.execute(sql,callback);
 };
 
