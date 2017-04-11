@@ -10,7 +10,7 @@ user_token_model.prototype.insert_new_record = function(data, callback) {
 };
 
 user_token_model.prototype.delete_old_record = function(data, callback) {
-	sql = "DELETE user_token WHERE user_id = " + data.user_id + " AND device_id = '" + data.device_id + "'";
+	sql = "DELETE FROM user_token WHERE user_id = " + data.user_id + " AND device_id = '" + data.device_id + "'";
 	this.execute(sql,callback);
 };
 
