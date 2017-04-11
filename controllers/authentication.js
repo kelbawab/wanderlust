@@ -153,20 +153,31 @@ function login(req, res, user_id) {
 	result['first_login'] = false;
 	result['code'] = '200';
 	tomodel.token = token;
-	user_token_model.insert_new_record(tomodel,function(err,rows){
-		user_activity_model.select_user_activities(tomodel,function(err,rows){
+	tomodel.device_id = req.headers['user-agent'];
+	user_token_model.delete_old_record(tomodel, function(err,rows) {
+		save_new_record(req, res);
+	});
+}
+
+function save_new_record(req, res) {
+	user_token_model.insert_new_record(tomodel, function(err,rows){
+		check_activities_and_first_login(req, res);
+	});
+}
+
+function check_activities_and_first_login(req, res) {
+	user_activity_model.select_user_activities(tomodel,function(err,rows){
+		if(rows.length > 0) {
+			result['activity'] = true;
+		}
+		user_model.select_user(tomodel,function(err,rows){
 			if(rows.length > 0) {
-				result['activity'] = true;
-			}
-			user_model.select_user(tomodel,function(err,rows){
-				if(rows.length > 0) {
-					if(rows[0].mobile_first == 1) {
-						result['first_login'] = true;	
-					}
+				if(rows[0].mobile_first == 1) {
+					result['first_login'] = true;	
 				}
-				res.send(result);
-			});	
-		});
+			}
+			res.send(result);
+		});	
 	});
 }
 
