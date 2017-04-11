@@ -155,17 +155,17 @@ function login(req, res, user_id) {
 	tomodel.token = token;
 	tomodel.device_id = req.headers['user-agent'];
 	user_token_model.delete_old_record(tomodel, function(err,rows) {
-		save_new_record(req, res);
+		save_new_record(req, res, result);
 	});
 }
 
-function save_new_record(req, res) {
+function save_new_record(req, res, result) {
 	user_token_model.insert_new_record(tomodel, function(err,rows){
-		check_activities_and_first_login(req, res);
+		check_activities_and_first_login(req, res, result);
 	});
 }
 
-function check_activities_and_first_login(req, res) {
+function check_activities_and_first_login(req, res, result) {
 	user_activity_model.select_user_activities(tomodel,function(err,rows){
 		if(rows.length > 0) {
 			result['activity'] = true;
