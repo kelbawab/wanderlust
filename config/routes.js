@@ -15,11 +15,26 @@ module.exports = function(app){
 	var users_activity_controller = require('../controllers/users_activity');
 	var users_city_activity_controller = require('../controllers/users_city_activity');
 	var user_preferences_controller = require('../controllers/user_preferences');
+	var nearby_controller = require('../controllers/nearby');
+	var fly_controller = require('../controllers/fly');
+	var country_controller = require('../controllers/country');
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+	//Middlewares++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	var user_middleware = require('../middlewares/user');
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	//Routes+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	app.post('/facebook_login', authentication_controller.facebook_login);
-	app.get('/user/activities/get', activities_controller.get);
+	app.get('/check_token/:token', authentication_controller.check_token);
+	app.get('/user/activities/get', user_middleware.user_check_sign_in, activities_controller.get);
+	app.post('/user/users_activity/post', user_middleware.user_check_sign_in, users_activity_controller.post);
+	app.get('/user/get', user_middleware.user_check_sign_in, user_controller.get);
+	app.post('/user/update_location', user_middleware.user_check_sign_in, user_controller.update_location);
+	app.post('/user/get_nearby_users', user_middleware.user_check_sign_in, nearby_controller.get);
+	app.post('/user/get_users_by_city', user_middleware.user_check_sign_in, fly_controller.get);
+	app.get('/get_countries', user_middleware.user_check_sign_in, country_controller.index);
+
 	app.post('/user/activities/post', activities_controller.post);
 	app.get('/user/activity/get/:id', activity_controller.get);
 	app.post('/user/activity/post', activity_controller.post);
@@ -31,12 +46,10 @@ module.exports = function(app){
 	app.get('/user/favourite/index', favourite_controller.index);
 	app.get('/user/block/index', block_controller.index);
 
-	app.post('/user/get', user_controller.get);
 	
 	app.get('/user/index', user_controller.index);
 	app.get('/user/city/index', city_controller.index);
 	app.get('/user/users_city/get/:city_id', users_city_controller.get);
-	app.get('/user/users_activity/get/:activity_id', users_activity_controller.get);
 	
 	app.post('/user/users_city_activity/get', users_city_activity_controller.get);
 	

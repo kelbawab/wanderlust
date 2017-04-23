@@ -10,7 +10,7 @@ user_model.prototype.insert_user_facebook = function(data, callback) {
 };
 
 user_model.prototype.select_user = function(data, callback) {
-	sql = "SELECT * FROM user WHERE id= " + data.user_id;
+	sql = "SELECT u.*, c.id, c.name, c.flag_image FROM user u JOIN country c on u.country_id = c.id WHERE u.id= " + data.user_id;
 	this.execute(sql,callback);
 };
 
@@ -35,7 +35,12 @@ user_model.prototype.select_users = function(data, callback) {
 };
 
 user_model.prototype.update_user_current_city = function(data, callback) {
-	sql = "UPDATE user SET current_city_id=" + data.city_id + " WHERE user_id=" + data.user_id;
+	sql = "UPDATE user SET current_city_id=" + data.city_id + " WHERE id=" + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_user_location = function(data, callback) {
+	sql = "UPDATE user SET current_city_id=" + data.city_id + ", current_latitude=" + data.lat + ", current_longitude=" + data.lng + " WHERE id=" + data.user_id;
 	this.execute(sql,callback);
 };
 
@@ -52,6 +57,16 @@ user_model.prototype.update_user_country = function(data, callback) {
 
 user_model.prototype.update_user_city = function(data, callback) {
 	sql = "UPDATE user SET current_city_id = " + data.city_id + " WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.get_nearby_users = function(data, callback) {
+	sql = "SELECT u.id, u.first_name, u.last_name, u.image_url, u.show_distance, c.name, c.flag_image, c.flag_image_small, ( 6371 * acos( cos( radians(" + data.lat + ") ) * cos( radians( u.current_latitude ) ) * cos( radians( u.current_longitude ) - radians(" + data.lng + ") ) + sin( radians(" + data.lat + ") ) * sin( radians( u.current_latitude ) ) ) ) AS distance FROM user u LEFT JOIN country c ON u.country_id = c.id JOIN user_activity ua ON u.id = ua.user_id WHERE u.id != " + data.user_id + " AND u.discoverable = 1 AND ua.activity_id IN (SELECT ua.activity_id FROM user u JOIN user_activity ua ON u.id = ua.user_id WHERE u.id = " + data.user_id + ") GROUP BY u.id HAVING distance < " + data.radius + " ORDER BY distance";
+	this.execute(sql,callback);
+};
+
+user_model.prototype.get_users_by_city = function(data, callback) {
+	sql = "SELECT u.id, u.first_name, u.last_name, u.image_url, c.name, c.flag_image, c.flag_image_small FROM user u LEFT JOIN country c ON u.country_id = c.id JOIN user_activity ua ON u.id = ua.user_id WHERE u.id != " + data.user_id + " AND u.discoverable = 1 AND u.current_city_id = " + data.city_id + " AND ua.activity_id IN (SELECT ua.activity_id FROM user u JOIN user_activity ua ON u.id = ua.user_id WHERE u.id = " + data.user_id + ") GROUP BY u.id";
 	this.execute(sql,callback);
 };
 

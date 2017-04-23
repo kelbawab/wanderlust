@@ -1,4 +1,5 @@
 var controller = function() {};
+controller.prototype.request = require('request');
 controller.prototype.jwt = require('jsonwebtoken');
 controller.prototype.secret = require('../config/secret').key;
 controller.prototype.generateToken = function (id, exp) {
@@ -7,6 +8,16 @@ controller.prototype.generateToken = function (id, exp) {
 	}, this.secret, { expiresIn: exp });
 	return token;
 };
+controller.prototype.verifyToken = function(token) {
+	try {
+	  	var decoded = this.jwt.verify(token, this.secret);
+	  	return {message:"succuess", content: decoded};
+	} catch(err) {
+	  	// err
+	  	console.log(err);
+	  	return {message:"error", content: err.name};
+	}
+}
 // controller.prototype.request = require('request');
 controller.prototype.validator = require('validator');
 // controller.prototype.bcrypt = require('bcrypt');

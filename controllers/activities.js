@@ -9,7 +9,8 @@ activities.prototype.constructor = activities;
 
 
 activities.prototype.get =  function(req, res) {
-	activity_model.select_all_activities(function(err,rows){
+	tomodel.user_id = req.session.user_id;
+	activity_model.select_all_activities(tomodel, function(err,rows){
 		var result = res.locals;
 		result['activities'] = rows;
 		result['code'] = '200';

@@ -14,5 +14,9 @@ user_token_model.prototype.delete_old_record = function(data, callback) {
 	this.execute(sql,callback);
 };
 
+user_token_model.prototype.get_record_by_token = function(data, callback) {
+	sql = "SELECT * FROM user_token WHERE token = '" + data.token + "'";
+	this.execute(sql,callback);
+};
 
 module.exports = new user_token_model();

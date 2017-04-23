@@ -4,8 +4,8 @@ activity_model.prototype.constructor  	= activity_model;
 activity_model.prototype     		= model;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-activity_model.prototype.select_all_activities = function(callback) {
-	sql = "SELECT * From activity ORDER BY name";
+activity_model.prototype.select_all_activities = function(data, callback) {
+	sql = "SELECT a.id, a.name, a.description, a.logo, COALESCE(ua.picked,false) AS picked From activity a LEFT JOIN (SELECT activity_id,  true AS picked FROM user_activity WHERE user_id=" + data.user_id + ") AS ua ON a.id = ua.activity_id ORDER BY a.name";
 	this.execute(sql,callback);
 };
 

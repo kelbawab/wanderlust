@@ -10,6 +10,52 @@ function authentication(){
 };
 authentication.prototype.constructor = authentication;
 
+authentication.prototype.check_token =  function(req, res) {
+    tomodel.token = req.params.token;
+    var result = res.locals;
+    user_token_model.get_record_by_token(tomodel, function(err, rows) {
+    	if(rows.length > 0) {
+    		var token = req.params.token;
+    		var payload = controller.verifyToken(token);
+    		console.log(payload);
+    		if(payload.message == "error") {
+    			if(payload.content == "TokenExpiredError") {
+					var user_id = rows[0].user_id;
+    				console.log(user_id);
+					login(req, res, user_id);
+					// var token = controller.generateToken(rows[0].user_id, '24h');
+					// result['token'] = token;
+					// result['code'] = '200';
+					// tomodel.token = token;
+					// tomodel.device_id = req.headers['user-agent'];
+					// user_token_model.delete_old_record(tomodel, function(err,rows) {
+					// 	user_token_model.insert_new_record(tomodel, function(err,rows){
+					// 		res.send(result);
+					// 	});
+					// });
+    			}
+    			else {
+    				result['code'] = '403';
+    				result['message'] = 'unauthorized';
+    				res.send(result);		
+    			}
+    		}
+    		else if(payload.message == "succuess") {
+    			result['code'] = '200';
+    			result['activity'] = false;
+				result['first_login'] = false;
+				tomodel.user_id = rows[0].user_id;
+    			check_activities_and_first_login(req, res, result);
+    		}
+    	}
+    	else {
+    		result['code'] = '403';
+    		result['message'] = 'unauthorized';
+    		res.send(result);
+    	}
+    });
+}
+
 //Function to list all contacts
 authentication.prototype.facebook_login =  function(req, res) {
     var user_info = req.body.user_info;
@@ -86,13 +132,14 @@ function create_new_facebook_user(req, res, user_info) {
 	if(user_info.last_name){
 		tomodel.last_name = user_info.last_name;
 	}
+	var base = req.protocol + '://' + req.get('host');
 
-	tomodel.cover = '';
+	tomodel.cover = base + '/images/users/no-image/no-cover-photo.jpg';
 	if(user_info.cover){
 		tomodel.cover = user_info.cover.source;
 	}
 
-	tomodel.image_url = '';
+	tomodel.image_url = base + '/images/users/no-image/no-profile-picture.png';
 	if(user_info.picture){
 		tomodel.image_url = user_info.picture.data.url;
 	}
@@ -116,26 +163,31 @@ function create_new_facebook_user(req, res, user_info) {
 					var country_id = rows[0].id;
 					update_user_country(user_id, country_id);
 				}
-			});
-		}
-
-		if (user_info.location) {
-			tomodel.city_name = location.location.city;
-			city_model.select_city_by_name(tomodel,function(err,rows){
-				if(rows.length > 0) {
-					var city_id = rows[0].id;
-					update_user_city(user_id, city_id);
+				else {
+					login(req, res, user_id);
 				}
 			});
 		}
-		login(req, res, user_id);
+
+		// if (user_info.location) {
+		// 	tomodel.city_name = location.location.city;
+		// 	city_model.select_city_by_name(tomodel,function(err,rows){
+		// 		if(rows.length > 0) {
+		// 			var city_id = rows[0].id;
+		// 			update_user_city(user_id, city_id);
+		// 		}
+		// 	});
+		// }
+		// login(req, res, user_id);
 	});
 }
 
 function update_user_country(user_id, country_id) {
 	tomodel.user_id = user_id;
 	tomodel.country_id = country_id;
-	user_model.update_user_country(tomodel,function(err,rows){});
+	user_model.update_user_country(tomodel,function(err,rows){
+		login(req, res, user_id);
+	});
 }
 
 function update_user_city(user_id, city_id) {
