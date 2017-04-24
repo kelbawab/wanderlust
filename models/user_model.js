@@ -10,7 +10,7 @@ user_model.prototype.insert_user_facebook = function(data, callback) {
 };
 
 user_model.prototype.select_user = function(data, callback) {
-	sql = "SELECT u.*, c.id, c.name, c.flag_image FROM user u JOIN country c on u.country_id = c.id WHERE u.id= " + data.user_id;
+	sql = "SELECT u.*, c.id, c.name, c.flag_image FROM user u LEFT JOIN country c on u.country_id = c.id WHERE u.id= " + data.user_id;
 	this.execute(sql,callback);
 };
 
