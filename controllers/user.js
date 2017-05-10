@@ -14,8 +14,13 @@ user.prototype.get =  function(req, res) {
 	tomodel.user_id = req.session.user_id;
 	var result = res.locals;
 	user_model.select_user(tomodel, function(err,rows){
+		console.log(err);
 		if(rows.length > 0) {
 			result['code'] = '200';
+			var age = calcAge(rows[0].birth_date);
+			var birthday = formatDate(rows[0].birth_date);
+			rows[0]['age'] = age;
+			rows[0]['birthday'] = birthday;
 			result['user_info'] = rows[0];
 			get_current_user_activity(req, res, result);
 		}
@@ -33,7 +38,9 @@ user.prototype.get_profile =  function(req, res) {
 		user_model.select_user_profile(tomodel, function(err,rows){
 			if(rows.length > 0) {
 				var age = calcAge(rows[0].birth_date);
+				var birthday = formatDate(rows[0].birth_date);
 				rows[0]['age'] = age;
+				rows[0]['birthday'] = birthday;
 				get_current_user_activity(req, res, rows[0]);
 			}
 			else {
@@ -50,6 +57,7 @@ user.prototype.get_profile =  function(req, res) {
 function get_current_user_activity(req, res, result) {
 	user_activity_model.select_user_activities_details(tomodel, function(err,rows) {
 		result['activities'] = rows;
+		console.log(result);
 		res.send(result);
 	});
 }
@@ -59,8 +67,77 @@ function calcAge(dateString) {
   return ~~((Date.now() - birthday) / (31557600000));
 }
 
-user.prototype.put =  function(req, res) {
+function formatDate(date) {
+  var monthNames = [
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "Jun", "Jul",
+    "Aug", "Sep", "Oct",
+    "Nov", "Dec"
+  ];
+  
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+
+  return monthNames[monthIndex] + ' '+ day + ',' + year;
+}
+
+user.prototype.update =  function(req, res) {
+	var user_info = req.body.user_info;
+	var validation_array = update_user_validations(user_info);
+    if(Object.keys(validation_array).length > 0) {
+		var result = controller.mergeArrays(validation_array, {code: 404, message:'Bad Request'});
+		res.send(result);
+	}
+	else{
+		tomodel.user_id = req.session.user_id;
+		tomodel.first_name = user_info.first_name;
+		tomodel.last_name = user_info.last_name;
+		tomodel.country_id = user_info.country_id;
+		tomodel.birth_date = user_info.birth_date;
+		tomodel.about = user_info.about;
+		user_model.update_user(tomodel, function(err,rows){
+			var result = res.locals;
+			result['code'] = '200';
+			res.send(result);
+		});
+	}
+}
+
+function update_user_validations(data) {
+	var validation_array = {};
 	
+	var first_name = controller.validate({first_name: data.first_name},['required','length:0-30']);
+	if(first_name){
+		validation_array = controller.mergeArrays(validation_array, first_name);
+	}
+	
+	var last_name = controller.validate({last_name: data.last_name},['required','length:0-30']);
+	if(last_name){
+		validation_array = controller.mergeArrays(validation_array, last_name);
+	}	
+	
+	var country_id = controller.validate({country_id: data.country_id},['required','integer']);
+	if(country_id){
+		validation_array = controller.mergeArrays(validation_array, country_id);
+	}	
+	
+	var birth_date = controller.validate({birth_date: data.birth_date},['required']);
+	if(birth_date){
+		validation_array = controller.mergeArrays(validation_array, birth_date);
+	}
+	else if(!controller.isValidDate(data.birth_date)) {
+		validation_array = controller.mergeArrays(validation_array, {birth_date_error: 'Birth Date is not valid'});	
+	}
+	
+
+	if(data.about) {
+		var about = controller.validate({about: data.about},['length:0-1000']);
+		if(about){
+			validation_array = controller.mergeArrays(validation_array, about);
+		}
+	}
+	return validation_array;
 }
 
 user.prototype.update_location =  function(req, res) {
@@ -185,6 +262,7 @@ function update_user_location(req, res) {
 	user_model.update_user_location(tomodel, function(err, rows) {
 		var result = res.locals;
 		result['code'] = '200';
+		result['city_name'] = tomodel.city_long_name;
 		res.send(result);
 	});
 }

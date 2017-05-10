@@ -54,6 +54,13 @@ controller.prototype.mergeArrays = function (array1, array2){
 	}
 	return result;
 };
+
+controller.prototype.isValidDate = function(date) {
+    var temp = date.split('-');
+    var d = new Date(temp[0] + '-' + temp[1] + '-' + temp[2]);
+    return (d && (d.getMonth() + 1) == temp[1] && d.getDate() == Number(temp[2]) && d.getFullYear() == Number(temp[0]));
+};
+
 controller.prototype.xssClean = function (fields){
 	var result ={};
 	for (var key in fields){

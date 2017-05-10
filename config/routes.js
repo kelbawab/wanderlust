@@ -33,7 +33,9 @@ module.exports = function(app){
 	app.post('/user/update_location', user_middleware.user_check_sign_in, user_controller.update_location);
 	app.post('/user/get_nearby_users', user_middleware.user_check_sign_in, nearby_controller.get);
 	app.post('/user/get_users_by_city', user_middleware.user_check_sign_in, fly_controller.get);
-	app.get('/get_countries', user_middleware.user_check_sign_in, country_controller.index);
+	app.get('/user/country/index', user_middleware.user_check_sign_in, country_controller.index);
+	app.post('/user/update', user_middleware.user_check_sign_in, user_controller.update);
+	app.get('/user/city/index', user_middleware.user_check_sign_in, city_controller.index);
 
 	app.post('/user/activities/post', activities_controller.post);
 	app.get('/user/activity/get/:id', activity_controller.get);
@@ -48,7 +50,7 @@ module.exports = function(app){
 
 	
 	app.get('/user/index', user_controller.index);
-	app.get('/user/city/index', city_controller.index);
+	
 	app.get('/user/users_city/get/:city_id', users_city_controller.get);
 	
 	app.post('/user/users_city_activity/get', users_city_activity_controller.get);
@@ -57,7 +59,7 @@ module.exports = function(app){
 	app.get('/user/city/index_limit/:limit', city_controller.index_limit);
 	app.get('/user/users_city_activity/search/:city_id/:activity_id/:limit/:query', users_city_activity_controller.search);
 	app.post('/user/users_city_activity/search_city/:city_id/:limit/:query', users_city_activity_controller.search_city);
-	app.post('/user/put', user_controller.put);
+
 	app.get('/user/preferences/index', user_preferences_controller.index);
 	app.post('/user/discoverable/post', user_preferences_controller.discoverable_post);
 	app.post('/user/radius/post', user_preferences_controller.radius_post);

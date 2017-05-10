@@ -5,17 +5,22 @@ user_model.prototype     		= model;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 user_model.prototype.insert_user_facebook = function(data, callback) {
-	sql = "INSERT INTO user (first_name, last_name, facebook_id, image_url, email, birth_date, about, cover_image_url, mobile_first, created_at) VALUES ('" + data.first_name + "', '" + data.last_name + "', '" + data.facebook_id + "', '" + data.image_url + "', '" + data.email + "', '" + data.birth_date + "', '" + data.about + "', '" + data.cover + "', 1, CURRENT_TIMESTAMP)";
+	sql = "INSERT INTO user (first_name, last_name, facebook_id, image_url, email, birth_date, about, cover_image_url, mobile_first, facebook_link, created_at) VALUES ('" + data.first_name + "', '" + data.last_name + "', '" + data.facebook_id + "', '" + data.image_url + "', '" + data.email + "', '" + data.birth_date + "', '" + data.about + "', '" + data.cover + "', 1, '" + data.facebook_link + "', CURRENT_TIMESTAMP)";
 	this.execute(sql,callback);
 };
 
 user_model.prototype.select_user = function(data, callback) {
-	sql = "SELECT u.*, c.id, c.name, c.flag_image FROM user u LEFT JOIN country c on u.country_id = c.id WHERE u.id= " + data.user_id;
+	sql = "SELECT u.*, co.name AS country_name, co.flag_image, co.flag_image_small, co.citizen_name, c.name AS city_name FROM user u LEFT JOIN country co on u.country_id = co.id LEFT JOIN city c on u.current_city_id = c.id WHERE u.id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_user = function(data, callback) {
+	sql = "UPDATE user SET first_name='" + data.first_name + "', last_name='" + data.last_name + "', birth_date='" + data.birth_date + "', about='" + data.about + "', country_id=" + data.country_id + ", mobile_first = 0 WHERE id=" + data.user_id;
 	this.execute(sql,callback);
 };
 
 user_model.prototype.select_user_profile = function(data, callback) {
-	sql = "SELECT u.first_name, u.last_name, u.image_url, u.cover_image_url, u.birth_date, u.about, c.citizen_name, c.flag_image FROM user u LEFT JOIN country c on u.country_id = c.id WHERE u.id= " + data.user_id;
+	sql = "SELECT u.first_name, u.last_name, u.image_url, u.cover_image_url, Date(u.birth_date), u.about, c.citizen_name, c.flag_image FROM user u LEFT JOIN country c on u.country_id = c.id WHERE u.id= " + data.user_id;
 	this.execute(sql,callback);
 };
 

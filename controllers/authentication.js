@@ -154,6 +154,11 @@ function create_new_facebook_user(req, res, user_info) {
 		tomodel.about = user_info.about;
 	}
 
+	tomodel.facebook_link = '';
+	if (user_info.link) {
+		tomodel.facebook_link = user_info.link;
+	}
+
 	user_model.insert_user_facebook(tomodel,function(err,rows){
 		var user_id = rows.insertId;
 		if (user_info.hometown) {

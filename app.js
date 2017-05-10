@@ -13,11 +13,12 @@ var express = require('express');
 // create a new express server
 var app = express();
 var parser = require('body-parser');
-var http = require('http');
+var http = require('http').createServer(app);
 var path = require('path');
 var session = require('express-session');
 var jwt = require('jsonwebtoken');
 var errorhandler = require('errorhandler');
+var io = require('socket.io')(http);
 
 require('cf-deployment-tracker-client').track();
 
@@ -48,7 +49,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var routes = require('./config/routes')(app);
 
-http.createServer(app).listen(app.get('port'),
+var sockets = {};
+io.on('connection', function(socket){
+  console.log("connected");
+  socket.on('set nickname', function (name) {
+	sockets[name] = socket;
+	console.log(sockets);
+  });
+  socket.on('chat message', function(name, msg){
+  	console.log(msg);
+  	sockets[name].emit('chat message', msg);
+  //  io.emit('chat message', msg);
+  });
+});
+
+http.listen(app.get('port'),
  function(){
   console.log('Express server listening on port ' + app.get('port'));
 });

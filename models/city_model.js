@@ -4,6 +4,11 @@ city_model.prototype.constructor  	= city_model;
 city_model.prototype     		= model;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+city_model.prototype.select_all_cities = function(callback) {
+	sql = "SELECT c.id AS city_id, c.name AS city_name, co.name AS country_name From city c LEFT JOIN country co ON c.country_id = co.id";
+	this.execute(sql,callback);
+};
+
 city_model.prototype.select_city_by_name = function(data, callback) {
 	sql = "SELECT * From city WHERE name = '" + data.city_name +"'";
 	this.execute(sql,callback);
