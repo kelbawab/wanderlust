@@ -18,6 +18,15 @@ controller.prototype.verifyToken = function(token) {
 	  	return {message:"error", content: err.name};
 	}
 }
+controller.prototype.randomString = function(len, charSet) {
+    charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var randomString = '';
+    for (var i = 0; i < len; i++) {
+        var randomPoz = Math.floor(Math.random() * charSet.length);
+        randomString += charSet.substring(randomPoz,randomPoz+1);
+    }
+    return randomString;
+}
 // controller.prototype.request = require('request');
 controller.prototype.validator = require('validator');
 // controller.prototype.bcrypt = require('bcrypt');
@@ -25,7 +34,7 @@ controller.prototype.validator = require('validator');
 controller.prototype.xssFilters = require('xss-filters');
 // controller.prototype.saltRounds = 10;
 // controller.prototype.multer  = require('multer');
-// controller.prototype.fs = require('fs');
+controller.prototype.fs = require('fs');
 // controller.prototype.mv = require('mv');
 // controller.prototype.deleteFolderRecursive = function(path) {
 //   if( this.fs.existsSync(path) ) {
@@ -136,6 +145,24 @@ controller.prototype.validate = function (field, validations) {
 			return isInteger(field, options);
 		}
 	}
+
+	//float:min-max == float
+	if(checkKeyStartWith(validations, 'float'))
+	{
+		var suffix = getKeyStartWith(validations, 'float');
+		var options = {};
+		var suffixArray = suffix.split(':');
+		if (suffixArray.length > 1) {
+			var min = suffix.split(':')[1].split('-')[0];
+			var max = suffix.split(':')[1].split('-')[1];
+			options['min'] = min;
+			options['max'] = max;
+		}
+		if(isFloat(field, options))
+		{
+			return isFloat(field, options);
+		}
+	}
 	return false;
 };
 
@@ -231,6 +258,31 @@ function isInteger(field, options) {
 	    		if(!controller.prototype.validator.isInt(field[key]))
 				{
 					var value = '<p>This field should be an integer</p>';
+					var result = {[key+'_error']: value};
+					return result;
+				}
+	    	}
+	    	
+			return false;
+	    }
+	}
+}
+
+function isFloat(field, options) {
+	for (var key in field){
+	    if (typeof field[key] !== 'function') {
+	    	if(Object.keys(options).length > 0){
+	    		if(!controller.prototype.validator.isFloat(field[key], {min: options['min'], max: options['max']}))
+				{
+					var value = '<p>This field should be a float range between '+ options['min'] +' and ' + options['max'] + '</p>';
+					var result = {[key+'_error']: value};
+					return result;
+				}
+	    	}
+	    	else{
+	    		if(!controller.prototype.validator.isFloat(field[key]))
+				{
+					var value = '<p>This field should be a float</p>';
 					var result = {[key+'_error']: value};
 					return result;
 				}

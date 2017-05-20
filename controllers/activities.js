@@ -8,9 +8,19 @@ function activities(){
 activities.prototype.constructor = activities;
 
 
-activities.prototype.get =  function(req, res) {
+activities.prototype.index =  function(req, res) {
 	tomodel.user_id = req.session.user_id;
 	activity_model.select_all_activities(tomodel, function(err,rows){
+		var result = res.locals;
+		result['activities'] = rows;
+		result['code'] = '200';
+		res.send(result);
+	});
+}
+
+activities.prototype.get =  function(req, res) {
+	tomodel.user_id = req.body.user_id;
+	user_activity_model.select_user_activities_details(tomodel, function(err,rows){
 		var result = res.locals;
 		result['activities'] = rows;
 		result['code'] = '200';

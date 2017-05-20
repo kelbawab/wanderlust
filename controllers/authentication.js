@@ -203,7 +203,7 @@ function update_user_city(user_id, city_id) {
 
 function login(req, res, user_id) {
 	tomodel.user_id = user_id;
-	var token = controller.generateToken(user_id, '24h');
+	var token = controller.generateToken(user_id, '999h');
 	var result = res.locals;
 	result['token'] = token;
 	result['activity'] = false;

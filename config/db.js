@@ -22,14 +22,25 @@ var mysql      = require('mysql');
 //     database : 'ad_f47af548feb67bb'
 // });
 
+// var connection = mysql.createPool({
+// 	connectionLimit : 10,
+//     host     : 'localhost',
+//     port     : '3306',
+//     user     : 'root',
+//     password : '',
+//     database : 'ad_f47af548feb67bb'
+// });
+
 var connection = mysql.createPool({
 	connectionLimit : 10,
-    host     : 'localhost',
+    host     : '139.162.191.140',
     port     : '3306',
-    user     : 'root',
-    password : '',
-    database : 'ad_f47af548feb67bb'
+    user     : 'wanderlust',
+    password : 'Wa123456..',
+    database : 'wanderlust'
 });
+
+
 // connection.connect(function(err) {
 //     if (err) {
 //     	console.error('Error connecting: ' + err.stack);

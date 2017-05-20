@@ -65,13 +65,43 @@ user_model.prototype.update_user_city = function(data, callback) {
 	this.execute(sql,callback);
 };
 
+user_model.prototype.update_show_distance = function(data, callback) {
+	sql = "UPDATE user SET show_distance = " + data.show_distance + " WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_discoverable = function(data, callback) {
+	sql = "UPDATE user SET discoverable = " + data.discoverable + " WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_discoverable_and_show_distance = function(data, callback) {
+	sql = "UPDATE user SET discoverable = " + data.discoverable + ", show_distance = " + data.show_distance + " WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_radius = function(data, callback) {
+	sql = "UPDATE user SET radius = " + data.radius + " WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_user_image_url = function(data, callback) {
+	sql = "UPDATE user SET image_url = '" + data.image_url + "' WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
+user_model.prototype.update_user_cover_image_url = function(data, callback) {
+	sql = "UPDATE user SET cover_image_url = '" + data.cover_image_url + "' WHERE id= " + data.user_id;
+	this.execute(sql,callback);
+};
+
 user_model.prototype.get_nearby_users = function(data, callback) {
-	sql = "SELECT u.id, u.first_name, u.last_name, u.image_url, u.show_distance, c.name, c.flag_image, c.flag_image_small, ( 6371 * acos( cos( radians(" + data.lat + ") ) * cos( radians( u.current_latitude ) ) * cos( radians( u.current_longitude ) - radians(" + data.lng + ") ) + sin( radians(" + data.lat + ") ) * sin( radians( u.current_latitude ) ) ) ) AS distance FROM user u LEFT JOIN country c ON u.country_id = c.id JOIN user_activity ua ON u.id = ua.user_id WHERE u.id != " + data.user_id + " AND u.discoverable = 1 AND ua.activity_id IN (SELECT ua.activity_id FROM user u JOIN user_activity ua ON u.id = ua.user_id WHERE u.id = " + data.user_id + ") GROUP BY u.id HAVING distance < " + data.radius + " ORDER BY distance";
+	sql = "SELECT u.id, u.first_name, u.last_name, u.image_url, u.cover_image_url, u.birth_date, u.show_distance, c.name, c.citizen_name, c.flag_image, c.flag_image_small, ( 6371 * acos( cos( radians(" + data.lat + ") ) * cos( radians( u.current_latitude ) ) * cos( radians( u.current_longitude ) - radians(" + data.lng + ") ) + sin( radians(" + data.lat + ") ) * sin( radians( u.current_latitude ) ) ) ) AS distance FROM user u LEFT JOIN country c ON u.country_id = c.id JOIN user_activity ua ON u.id = ua.user_id WHERE u.id != " + data.user_id + " AND u.discoverable = 1 AND ua.activity_id IN (SELECT ua.activity_id FROM user u JOIN user_activity ua ON u.id = ua.user_id WHERE u.id = " + data.user_id + ") GROUP BY u.id HAVING distance < " + data.radius + " ORDER BY distance";
 	this.execute(sql,callback);
 };
 
 user_model.prototype.get_users_by_city = function(data, callback) {
-	sql = "SELECT u.id, u.first_name, u.last_name, u.image_url, c.name, c.flag_image, c.flag_image_small FROM user u LEFT JOIN country c ON u.country_id = c.id JOIN user_activity ua ON u.id = ua.user_id WHERE u.id != " + data.user_id + " AND u.discoverable = 1 AND u.current_city_id = " + data.city_id + " AND ua.activity_id IN (SELECT ua.activity_id FROM user u JOIN user_activity ua ON u.id = ua.user_id WHERE u.id = " + data.user_id + ") GROUP BY u.id";
+	sql = "SELECT u.id, u.first_name, u.last_name, u.image_url, u.cover_image_url, u.birth_date, u.show_distance, c.name, c.citizen_name, c.flag_image, c.flag_image_small FROM user u LEFT JOIN country c ON u.country_id = c.id JOIN user_activity ua ON u.id = ua.user_id WHERE u.id != " + data.user_id + " AND u.discoverable = 1 AND u.current_city_id = " + data.city_id + " AND ua.activity_id IN (SELECT ua.activity_id FROM user u JOIN user_activity ua ON u.id = ua.user_id WHERE u.id = " + data.user_id + ") GROUP BY u.id";
 	this.execute(sql,callback);
 };
 

@@ -18,6 +18,7 @@ module.exports = function(app){
 	var nearby_controller = require('../controllers/nearby');
 	var fly_controller = require('../controllers/fly');
 	var country_controller = require('../controllers/country');
+	var chat_controller = require('../controllers/chat');
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	//Middlewares++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -27,7 +28,8 @@ module.exports = function(app){
 	//Routes+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	app.post('/facebook_login', authentication_controller.facebook_login);
 	app.get('/check_token/:token', authentication_controller.check_token);
-	app.get('/user/activities/get', user_middleware.user_check_sign_in, activities_controller.get);
+	app.get('/user/activities/index', user_middleware.user_check_sign_in, activities_controller.index);
+	app.post('/user/activities/get', user_middleware.user_check_sign_in, activities_controller.get);
 	app.post('/user/users_activity/post', user_middleware.user_check_sign_in, users_activity_controller.post);
 	app.get('/user/get', user_middleware.user_check_sign_in, user_controller.get);
 	app.post('/user/update_location', user_middleware.user_check_sign_in, user_controller.update_location);
@@ -36,16 +38,29 @@ module.exports = function(app){
 	app.get('/user/country/index', user_middleware.user_check_sign_in, country_controller.index);
 	app.post('/user/update', user_middleware.user_check_sign_in, user_controller.update);
 	app.get('/user/city/index', user_middleware.user_check_sign_in, city_controller.index);
+	app.get('/user/chat/index', user_middleware.user_check_sign_in, chat_controller.index);
+	app.post('/user/chat/get', user_middleware.user_check_sign_in, chat_controller.get);
+	app.post('/user/chat/post', user_middleware.user_check_sign_in, chat_controller.post);
+	app.post('/user/update_show_distance', user_middleware.user_check_sign_in, user_controller.update_show_distance);
+	app.post('/user/update_discoverable', user_middleware.user_check_sign_in, user_controller.update_discoverable);
+	app.post('/user/update_radius', user_middleware.user_check_sign_in, user_controller.update_radius);
+	app.post('/user/favourite/get', user_middleware.user_check_sign_in, favourite_controller.get);
+	app.post('/user/favourite/post', user_middleware.user_check_sign_in, favourite_controller.post);
+	app.post('/user/unfavourite/post', user_middleware.user_check_sign_in, unfavourite_controller.post);
+	app.get('/user/favourite/index', user_middleware.user_check_sign_in, favourite_controller.index);
+	app.get('/user/unfavourite/index', user_middleware.user_check_sign_in, unfavourite_controller.index);
+
+
+	app.get('/user/test', user_controller.test);
 
 	app.post('/user/activities/post', activities_controller.post);
 	app.get('/user/activity/get/:id', activity_controller.get);
 	app.post('/user/activity/post', activity_controller.post);
-	app.post('/user/favourite/post', favourite_controller.post);
-	app.post('/user/unfavourite/post', unfavourite_controller.post);
+	
 	app.post('/user/block/post', block_controller.post);
 	app.post('/user/unblock/post', unblock_controller.post);
 	app.post('/user/report/post', report_controller.post);
-	app.get('/user/favourite/index', favourite_controller.index);
+	
 	app.get('/user/block/index', block_controller.index);
 
 	

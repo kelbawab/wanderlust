@@ -16,7 +16,7 @@ user.prototype.user_check_sign_in = function(req, res, next) {
             res.send(result);
         }
         else if(payload.message == "succuess") {
-            console.log(token);
+            // console.log(token);
             req.session.user_id = payload.content.data;
             next();
         }    
