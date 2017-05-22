@@ -29,10 +29,10 @@ controller.prototype.randomString = function(len, charSet) {
 }
 // controller.prototype.request = require('request');
 controller.prototype.validator = require('validator');
-// controller.prototype.bcrypt = require('bcrypt');
+controller.prototype.bcrypt = require('bcrypt');
 // controller.prototype.generatePassword = require("password-generator");
 controller.prototype.xssFilters = require('xss-filters');
-// controller.prototype.saltRounds = 10;
+controller.prototype.saltRounds = 10;
 // controller.prototype.multer  = require('multer');
 controller.prototype.fs = require('fs');
 // controller.prototype.mv = require('mv');
@@ -49,6 +49,27 @@ controller.prototype.fs = require('fs');
 //     this.fs.rmdirSync(path);
 //   }
 // };
+
+controller.prototype.calcAge = function(dateString) {
+  var birthday = +new Date(dateString);
+  return ~~((Date.now() - birthday) / (31557600000));
+}
+
+controller.prototype.formatDate = function(date) {
+  var monthNames = [
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "Jun", "Jul",
+    "Aug", "Sep", "Oct",
+    "Nov", "Dec"
+  ];
+  
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+
+  return monthNames[monthIndex] + ' '+ day + ', ' + year;
+}
+
 controller.prototype.mergeArrays = function (array1, array2){
 	var result ={};
 	for (var key in array1){
@@ -121,7 +142,6 @@ controller.prototype.validate = function (field, validations) {
 		var blocks = suffix.split('||');
 		var message = blocks[blocks.length - 1];
 		var regex = suffix.slice('match_regex:'.length,(-message.length -2));
-		message = '<p>' + message + '</p>';
 		if(validateWithRegex(regex, message, field))
 		{
 			return (validateWithRegex(regex, message, field));
@@ -206,7 +226,7 @@ function required(field) {
 	    if (typeof field[key] !== 'function') {
 	    	if(controller.prototype.validator.isEmpty(field[key]))
 			{
-				var value = '<p>This filed is required</p>';
+				var value = 'This filed is required';
 				var result = {[key+'_error']: value};
 				return result;
 			}
@@ -220,7 +240,7 @@ function isEmail(field) {
 	    if (typeof field[key] !== 'function') {
 	    	if(!controller.prototype.validator.isEmail(field[key]))
 			{
-				var value = '<p>This is not a valid email</p>';
+				var value = 'This is not a valid email';
 				var result = {[key+'_error']: value};
 				return result;
 			}
@@ -234,7 +254,7 @@ function isLength(field, min, max) {
 	    if (typeof field[key] !== 'function') {
 	    	if(!controller.prototype.validator.isLength(field[key], {min: min, max: max}))
 			{
-				var value = '<p>The length of this field should be between '+ min +' and ' + max + '</p>';
+				var value = 'The length of this field should be between '+ min +' and ' + max;
 				var result = {[key+'_error']: value};
 				return result;
 			}
@@ -249,7 +269,7 @@ function isInteger(field, options) {
 	    	if(Object.keys(options).length > 0){
 	    		if(!controller.prototype.validator.isInt(field[key], {min: options['min'], max: options['max']}))
 				{
-					var value = '<p>This field should be an integer range between '+ options['min'] +' and ' + options['max'] + '</p>';
+					var value = 'This field should be an integer range between '+ options['min'] +' and ' + options['max'];
 					var result = {[key+'_error']: value};
 					return result;
 				}
@@ -257,7 +277,7 @@ function isInteger(field, options) {
 	    	else{
 	    		if(!controller.prototype.validator.isInt(field[key]))
 				{
-					var value = '<p>This field should be an integer</p>';
+					var value = 'This field should be an integer';
 					var result = {[key+'_error']: value};
 					return result;
 				}
@@ -274,7 +294,7 @@ function isFloat(field, options) {
 	    	if(Object.keys(options).length > 0){
 	    		if(!controller.prototype.validator.isFloat(field[key], {min: options['min'], max: options['max']}))
 				{
-					var value = '<p>This field should be a float range between '+ options['min'] +' and ' + options['max'] + '</p>';
+					var value = 'This field should be a float range between '+ options['min'] +' and ' + options['max'];
 					var result = {[key+'_error']: value};
 					return result;
 				}
@@ -282,7 +302,7 @@ function isFloat(field, options) {
 	    	else{
 	    		if(!controller.prototype.validator.isFloat(field[key]))
 				{
-					var value = '<p>This field should be a float</p>';
+					var value = 'This field should be a float';
 					var result = {[key+'_error']: value};
 					return result;
 				}

@@ -26,6 +26,8 @@ module.exports = function(app){
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	//Routes+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	app.post('/signup', authentication_controller.sign_up);
+	app.post('/login', authentication_controller.normal_login);
 	app.post('/facebook_login', authentication_controller.facebook_login);
 	app.get('/check_token/:token', authentication_controller.check_token);
 	app.get('/user/activities/index', user_middleware.user_check_sign_in, activities_controller.index);

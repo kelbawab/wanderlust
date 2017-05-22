@@ -9,6 +9,11 @@ user_model.prototype.insert_user_facebook = function(data, callback) {
 	this.execute(sql,callback);
 };
 
+user_model.prototype.insert_new_user = function(data, callback) {
+	sql = "INSERT INTO user (first_name, last_name, email, mobile_first, password, created_at) VALUES ('" + data.first_name + "', '" + data.last_name + "', '" + data.email + "', 1, '" + data.password + "', CURRENT_TIMESTAMP)";
+	this.execute(sql,callback);
+};
+
 user_model.prototype.select_user = function(data, callback) {
 	sql = "SELECT u.*, co.name AS country_name, co.flag_image, co.flag_image_small, co.citizen_name, c.name AS city_name FROM user u LEFT JOIN country co on u.country_id = co.id LEFT JOIN city c on u.current_city_id = c.id WHERE u.id= " + data.user_id;
 	this.execute(sql,callback);
@@ -30,7 +35,7 @@ user_model.prototype.select_user_by_facebook_id = function(data, callback) {
 };
 
 user_model.prototype.select_user_by_email = function(data, callback) {
-	sql = "SELECT * FROM user WHERE email= " + data.facebook_id;
+	sql = "SELECT * FROM user WHERE email= '" + data.email +"'";
 	this.execute(sql,callback);
 };
 

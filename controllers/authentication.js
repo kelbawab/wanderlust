@@ -56,6 +56,98 @@ authentication.prototype.check_token =  function(req, res) {
     });
 }
 
+authentication.prototype.normal_login =  function(req, res) {
+	try {
+		console.log(req.body);
+		var user_info = req.body.user_info;
+		console.log(user_info);
+	    var validation_array = login_validations(user_info);
+	    if(Object.keys(validation_array).length > 0) {
+			var result = controller.mergeArrays(validation_array, {code: 404, message:'Bad Request'});
+			res.send(result);
+		}
+		else {
+			tomodel.email = user_info.email;
+	        user_model.select_user_by_email(tomodel,function(err,rows) {
+	        	if(rows.length > 0)
+		        {
+		            controller.bcrypt.compare(user_info.password, rows[0].password, function(err, cmp) {
+		                // res == true
+		                if(cmp)
+		                {
+		                	login(req, res, rows[0].id);
+		                }
+		                else {
+		                	var data = res.locals;
+							data['login_error'] = "Invalid Credentials";
+							data['code'] = '404';
+							data['message'] = 'Bad Request';
+							res.send(data);
+		                }
+		            });
+		        }
+		        else {
+		        	var data = res.locals;
+					data['login_error'] = "Invalid Credentials";
+					data['code'] = '404';
+					data['message'] = 'Bad Request';
+					res.send(data);
+		        }
+	        }); 
+		}	
+	}
+	catch(err){
+		console.log(err);
+		var result = res.locals;
+		result['code'] = '400';
+		res.send(result);
+	}
+}
+
+authentication.prototype.sign_up =  function(req, res) {
+	try {
+		var user_info = req.body.user_info;
+		console.log(req.body);
+		console.log(user_info);
+	    var validation_array = sign_up_validations(user_info);
+	    if(Object.keys(validation_array).length > 0) {
+			var result = controller.mergeArrays(validation_array, {code: 404, message:'Bad Request'});
+			res.send(result);
+		}
+		else {
+			tomodel.email = user_info.email;
+			user_model.select_user_by_email(tomodel,function(err,rows){
+				if(rows.length > 0) {
+					var data = res.locals;
+					data['email_error'] = "This email is already registered";
+					data['code'] = '404';
+					data['message'] = 'Bad Request';
+					res.send(data);
+				}
+				else {
+					controller.bcrypt.hash(user_info.password, controller.saltRounds, function(err, hash) {
+						tomodel.first_name = user_info.first_name;
+						tomodel.last_name = user_info.last_name;
+						tomodel.password = hash;
+
+						user_model.insert_new_user(tomodel,function(err,rows){
+							var data = res.locals;
+							data['code'] = '200';
+							res.send(data);
+						});
+					});	
+				}
+			});
+		}	
+	}
+	catch(err){
+		console.log(err);
+		var result = res.locals;
+		result['code'] = '400';
+		res.send(result);
+	}
+}
+
 //Function to list all contacts
 authentication.prototype.facebook_login =  function(req, res) {
     var user_info = req.body.user_info;
@@ -236,6 +328,51 @@ function check_activities_and_first_login(req, res, result) {
 			res.send(result);
 		});	
 	});
+}
+
+function sign_up_validations(data) {
+	var validation_array = {};
+
+	var email = controller.validate({email: data.email},['required', 'email', 'length:0-100']);
+	if(email){
+		validation_array = controller.mergeArrays(validation_array, email);
+	}
+
+	var first_name = controller.validate({first_name: data.first_name},['required', 'length:0-30']);
+	if(first_name){
+		validation_array = controller.mergeArrays(validation_array, first_name);
+	}
+	
+	var last_name = controller.validate({last_name: data.last_name},['required', 'length:0-30']);
+	if(last_name){
+		validation_array = controller.mergeArrays(validation_array, last_name);
+	}
+
+	var password = controller.validate({password: data.password},['required', 'length:8-100']);
+	if(password){
+		validation_array = controller.mergeArrays(validation_array, password);
+	}
+
+	if(data.password != data.confirm_password) {
+		validation_array = controller.mergeArrays(validation_array, {confirm_password_error: "password and confirm password do not match"});	
+	}
+	
+	return validation_array;
+}
+
+function login_validations(data) {
+	var validation_array = {};
+
+	var email = controller.validate({email: data.email},['required', 'email', 'length:0-100']);
+	if(email){
+		validation_array = controller.mergeArrays(validation_array, email);
+	}
+
+	var password = controller.validate({password: data.password},['required', 'length:8-100']);
+	if(password){
+		validation_array = controller.mergeArrays(validation_array, password);
+	}
+	return validation_array;
 }
 
 function facebook_user_validations(data) {

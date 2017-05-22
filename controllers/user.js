@@ -31,8 +31,8 @@ user.prototype.get =  function(req, res) {
 		if(rows.length > 0) {
 			result['code'] = '200';
 			try {
-				var age = calcAge(rows[0].birth_date);
-				var birthday = formatDate(rows[0].birth_date);
+				var age = controller.calcAge(rows[0].birth_date);
+				var birthday = controller.formatDate(rows[0].birth_date);
 				rows[0]['age'] = age;
 				rows[0]['birthday'] = birthday;	
 			}
@@ -125,8 +125,8 @@ user.prototype.get_profile =  function(req, res) {
 	if(Number.isInteger(parseInt(tomodel.user_id))) {
 		user_model.select_user_profile(tomodel, function(err,rows){
 			if(rows.length > 0) {
-				var age = calcAge(rows[0].birth_date);
-				var birthday = formatDate(rows[0].birth_date);
+				var age = controller.calcAge(rows[0].birth_date);
+				var birthday = controller.formatDate(rows[0].birth_date);
 				rows[0]['age'] = age;
 				rows[0]['birthday'] = birthday;
 				get_current_user_activity(req, res, rows[0]);
@@ -148,26 +148,6 @@ function get_current_user_activity(req, res, result) {
 		// console.log(result);
 		res.send(result);
 	});
-}
-
-function calcAge(dateString) {
-  var birthday = +new Date(dateString);
-  return ~~((Date.now() - birthday) / (31557600000));
-}
-
-function formatDate(date) {
-  var monthNames = [
-    "Jan", "Feb", "Mar",
-    "Apr", "May", "Jun", "Jul",
-    "Aug", "Sep", "Oct",
-    "Nov", "Dec"
-  ];
-  
-  var day = date.getDate();
-  var monthIndex = date.getMonth();
-  var year = date.getFullYear();
-
-  return monthNames[monthIndex] + ' '+ day + ',' + year;
 }
 
 user.prototype.update =  function(req, res) {
